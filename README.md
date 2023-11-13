@@ -2,6 +2,25 @@
 
 <h1>Mongodb-Drive-Hub</h1>
 
-<i>Use mongodb to store your files</i>
+<i>Use a high-performance Mongodb database cluster to store your files</i>
 
 </div>
+
+## Getting Started
+
+### Requirements
+
+```
+pymongo
+py7zr
+```
+### Use
+
+- clone this repositories
+- cd to cli
+- install dependencies
+- run python main.py
+
+## How to store files
+
+![未命名](https://github.com/Anjiurine/Mongodb-Drive-Hub/assets/147403913/5d98a626-81f5-44ed-9481-6991114ab39b)
