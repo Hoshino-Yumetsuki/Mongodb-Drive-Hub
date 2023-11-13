@@ -1,3 +1,4 @@
+# user_io.py
 import sys
 from . import mongo_utils
 
@@ -26,6 +27,7 @@ def parse_input(user_input, client):
             print_success("The file has been uploaded and the file id is:" + str(file_id))
         except Exception as e:
             print_error(e)
+
     elif command == "dl" or command == "download" and len(user_input) == 2:
         file_sha256 = user_input[1]
         db_name = "files"
@@ -39,6 +41,7 @@ def parse_input(user_input, client):
                 print_error("File does not exist")
         except Exception as e:
             print_error(e)
+
     elif command == "ls" or command == "list" and len(user_input) == 1:
         db_name = "files"
         col_name = "files"
@@ -56,6 +59,20 @@ def parse_input(user_input, client):
                 print_error("No file")
         except Exception as e:
             print_error(e)
+
+    elif command == "rm" or command == "remove" and len(user_input) == 2:
+        file_sha256 = user_input[1]
+        db_name = "files"
+        col_name = "files"
+        try:
+            result = mongo_utils.delete_file(client, db_name, col_name, file_sha256)
+            if result:
+                print_success("The file has been deleted")
+            else:
+                print_error("File does not exist")
+        except Exception as e:
+            print_error(e)
+
     elif command == "exit":
         sys.exit()
     else:

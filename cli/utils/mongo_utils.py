@@ -1,3 +1,4 @@
+# mongo_utils.py
 import base64
 import hashlib
 from pymongo import MongoClient
@@ -57,3 +58,12 @@ def list_files(client, db_name, col_name):
         }
         file_list.append(file_info)
     return file_list
+
+def delete_file(client, db_name, col_name, file_sha256):
+    db = client[db_name]
+    col = db[col_name]
+    file_doc = col.find_one_and_delete({"sha256": file_sha256})
+    if file_doc:
+        return True
+    else:
+        return False
