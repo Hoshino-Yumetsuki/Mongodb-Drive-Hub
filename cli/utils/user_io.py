@@ -3,9 +3,9 @@ from . import mongo_utils
 
 def print_welcome():
     print("You can use the following commands to manipulate files:")
-    print("upload <file_path> - Upload files to mongodb")
-    print("download <file_sha256> - Download files from mongodb")
-    print("list - View file list in mongodb")
+    print("up or upload <file_path> - Upload files to mongodb")
+    print("dl or download <file_sha256> - Download files from mongodb")
+    print("ls or list - View file list in mongodb")
     print("exit - Exit the program")
 
 def print_error(error):
@@ -17,7 +17,7 @@ def print_success(message):
 def parse_input(user_input, client):
     user_input = user_input.split()
     command = user_input[0]
-    if command == "upload" and len(user_input) == 2:
+    if command == "up" or command == "upload" and len(user_input) == 2:
         file_path = user_input[1]
         db_name = "files"
         col_name = "files"
@@ -26,7 +26,7 @@ def parse_input(user_input, client):
             print_success("The file has been uploaded and the file id is:" + str(file_id))
         except Exception as e:
             print_error(e)
-    elif command == "download" and len(user_input) == 2:
+    elif command == "dl" or command == "download" and len(user_input) == 2:
         file_sha256 = user_input[1]
         db_name = "files"
         col_name = "files"
@@ -39,7 +39,7 @@ def parse_input(user_input, client):
                 print_error("File does not exist")
         except Exception as e:
             print_error(e)
-    elif command == "list" and len(user_input) == 1:
+    elif command == "ls" or command == "list" and len(user_input) == 1:
         db_name = "files"
         col_name = "files"
         try:
