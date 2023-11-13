@@ -14,8 +14,20 @@
 pymongo
 py7zr
 ```
+
+
 ### Use
 
+- create uri_list.json in cli
+  - like this
+  ```json
+  {
+    "uri_list": [
+        "<your_db_uri>",
+        "and more ..."
+    ]
+  }
+  ```
 - clone this repositories
 - cd to cli
 - install dependencies
