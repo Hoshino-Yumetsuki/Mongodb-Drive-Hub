@@ -21,7 +21,7 @@ py7zr
 - clone this repositories
 - cd to cli
 - install dependencies
-- create uri_list.json in cli
+- edit or create uri_list.json in cli
   - like this
   ```json
   {
