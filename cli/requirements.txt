@@ -1,1 +1,2 @@
 pymongo
+py7zr
