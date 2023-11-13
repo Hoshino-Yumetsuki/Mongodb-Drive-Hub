@@ -18,6 +18,9 @@ py7zr
 
 ### Use
 
+- clone this repositories
+- cd to cli
+- install dependencies
 - create uri_list.json in cli
   - like this
   ```json
@@ -28,9 +31,6 @@ py7zr
     ]
   }
   ```
-- clone this repositories
-- cd to cli
-- install dependencies
 - run python main.py
 
 ## How to store files
