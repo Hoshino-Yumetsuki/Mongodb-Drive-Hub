@@ -1,3 +1,6 @@
 cli/utils/__pycache__/
 cli/download/
 uri_list.json
+dist/
+build/
+*.spec
