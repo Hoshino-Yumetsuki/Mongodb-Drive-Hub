@@ -1,5 +1,6 @@
 {
     "uri_list": [
-        "<your_db_uri>"
+        "mongodb+srv://Q78KG:Q78kg123@cluster0.iqxcfru.mongodb.net/?retryWrites=true&w=majority",
+        "mongodb+srv://Q78KG:Q78kg123@cluster0.4gblhzc.mongodb.net/?retryWrites=true&w=majority"
     ]
 }

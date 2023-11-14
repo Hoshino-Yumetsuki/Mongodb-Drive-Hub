@@ -11,11 +11,12 @@ def connect_mongo_cluster(uri_list):
         client_list.append(client)
     return client_list
 
+# mongo_utils.py
 def upload_file(client_list, file_path):
     with open(file_path, "rb") as f:
         file_data = f.read()
     file_sha256 = hashlib.sha256(file_data).hexdigest()
-    file_name, file_ext = file_path.split(".")
+    file_name, file_ext = os.path.basename(file_path).split(".")
     file_size = os.path.getsize(file_path)
     file_7z_path = file_path + ".7z"
     with py7zr.SevenZipFile(file_7z_path, 'w') as archive:
@@ -46,6 +47,7 @@ def upload_file(client_list, file_path):
         }
         col.insert_one(chunk_doc)
     return file_sha256
+
 
 def download_file(client_list, file_sha256, save_path):
     file_7z_data = b""
@@ -107,3 +109,38 @@ def delete_file(client_list, file_sha256):
         if not chunk_doc:
             result = False
     return result
+
+def reindex_file(client_list):
+    result = False
+    file_list = list_files(client_list)
+    for file_info in file_list:
+        file_sha256 = file_info["sha256"]
+        file_path = download_file(client_list, file_sha256, "./cache")
+        if file_path:
+            os.remove(file_path)
+            delete_file(client_list, file_sha256)
+            upload_file(client_list, file_path)
+            result = True
+    return result
+
+def search_file(client_list, keyword):
+    file_list = []
+    client = client_list[0]
+    db = client["files"]
+    col = db["files"]
+    for chunk_doc in col.find({"chunk_no": 1, "$or": [{"name": keyword}, {"name": {"$regex": keyword}}]}):
+        file_name = chunk_doc["name"]
+        file_ext = chunk_doc["ext"]
+        file_path = file_name + "." + file_ext
+        file_size = chunk_doc["size"]
+        file_sha256 = chunk_doc["sha256"]
+        total_chunks = chunk_doc["total_chunks"]
+        file_info = {
+            "path": file_path,
+            "name": file_name + "." + file_ext,
+            "size": file_size,
+            "sha256": file_sha256,
+            "total_chunks": total_chunks
+        }
+        file_list.append(file_info)
+    return file_list

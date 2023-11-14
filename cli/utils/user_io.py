@@ -1,4 +1,5 @@
 import sys
+import os
 from . import mongo_utils
 
 def print_welcome():
@@ -7,6 +8,8 @@ def print_welcome():
     print("dl or download <file_sha256> - Download files from mongodb cluster")
     print("ls or list - View file list in mongodb cluster")
     print("rm or remove <file_sha256> - Remove files from mongodb cluster")
+    print("re or reindex - Reallocate storage space")
+    print("se or search <keyword> - Search files")
     print("exit - Exit the program")
 
 def print_error(error):
@@ -19,7 +22,7 @@ def parse_input(user_input, client_list):
     user_input = user_input.split()
     command = user_input[0]
     if command == "up" or command == "upload" and len(user_input) == 2:
-        file_path = user_input[1]
+        file_path = user_input[1].strip('"').replace("\\", "/")
         try:
             file_sha256 = mongo_utils.upload_file(client_list, file_path)
             print_success("The file has been uploaded and the file sha256 is:" + file_sha256)
@@ -27,7 +30,9 @@ def parse_input(user_input, client_list):
             print_error(e)
     elif command == "dl" or command == "download" and len(user_input) == 2:
         file_sha256 = user_input[1]
-        save_path = "./"
+        if os.path.exists('./download') == False:
+            os.mkdir('./download')
+        save_path = "./download/"
         try:
             file_path = mongo_utils.download_file(client_list, file_sha256, save_path)
             if file_path:
@@ -62,6 +67,40 @@ def parse_input(user_input, client_list):
                 print_error("File does not exist")
         except Exception as e:
             print_error(e)
+    elif command == "re" or command == "reindex" and len(user_input) == 1:
+        confirm = input("Are you sure you want to reindex all files? This may take a long time. (y/n)")
+        if confirm == "y":
+            try:
+                result = mongo_utils.reindex_file(client_list)
+                if result:
+                    print_success("All files have been reindexed")
+                else:
+                    print_error("No file needs to be reindexed")
+            except Exception as e:
+                print_error(e)
+        elif confirm == "n":
+            print("Operation canceled")
+        else:
+            print_error("Invalid input")
+
+    elif command == "se" or command == "search" and len(user_input) == 2:
+        keyword = user_input[1]
+        try:
+            file_list = mongo_utils.search_file(client_list, keyword)
+            if file_list:
+                print_success("The search results are as follows:")
+                for file_info in file_list:
+                    print("File path:", file_info["path"])
+                    print("File name:", file_info["name"])
+                    print("File size:", file_info["size"])
+                    print("File sha256:", file_info["sha256"])
+                    print("Total chunks:", file_info["total_chunks"])
+                    print("--------------------")
+            else:
+                print_error("No file matches the keyword")
+        except Exception as e:
+            print_error(e)
+
     elif command == "exit":
         sys.exit()
     else:

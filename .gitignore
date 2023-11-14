@@ -1,1 +1,3 @@
 cli/utils/__pycache__/
+cli/download/
+uri_list.json

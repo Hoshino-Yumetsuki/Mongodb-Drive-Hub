@@ -1,14 +1,21 @@
 from utils import user_io
 from utils import mongo_utils
 import json
+import os
 
-with open("uri_list.json", "r") as f:
-    uri_list = json.load(f)["uri_list"]
+if os.path.exists('./uri_list.json') == False:
+    print("uri_list.json not found")
+    exit()
 
-client_list = mongo_utils.connect_mongo_cluster(uri_list)
+else:
 
-user_io.print_welcome()
+    with open("uri_list.json", "r") as f:
+        uri_list = json.load(f)["uri_list"]
 
-while True:
-    user_input = input("Please enter the command：")
-    user_io.parse_input(user_input, client_list)
+    client_list = mongo_utils.connect_mongo_cluster(uri_list)
+
+    user_io.print_welcome()
+
+    while True:
+        user_input = input("Please enter the command：")
+        user_io.parse_input(user_input, client_list)
