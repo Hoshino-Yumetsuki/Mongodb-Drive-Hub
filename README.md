@@ -18,6 +18,7 @@ py7zr
 
 ### Use
 
+#### Use .py
 - clone this repositories
 - cd to cli
 - install dependencies
@@ -32,6 +33,11 @@ py7zr
   }
   ```
 - run python main.py
+
+#### Use cli
+
+- download cli from release
+- run ./mdh
 
 ## How to store files
 
