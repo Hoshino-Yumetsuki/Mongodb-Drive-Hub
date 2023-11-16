@@ -4,3 +4,4 @@ uri_list.json
 dist
 build
 *.spec
+cache
