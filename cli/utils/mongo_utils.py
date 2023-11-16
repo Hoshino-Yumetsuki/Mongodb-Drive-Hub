@@ -109,18 +109,8 @@ def delete_file(client_list, file_sha256):
             result = False
     return result
 
-def reindex_file(client_list):
-    result = False
-    file_list = list_files(client_list)
-    for file_info in file_list:
-        file_sha256 = file_info["sha256"]
-        file_path = download_file(client_list, file_sha256, "./cache/")
-        if file_path:
-            os.remove(file_path)
-            delete_file(client_list, file_sha256)
-            upload_file(client_list, file_path)
-            result = True
-    return result
+import base64
+import os
 
 def search_file(client_list, keyword):
     file_list = []

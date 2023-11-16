@@ -8,7 +8,6 @@ def print_welcome():
     print("dl or download <file_sha256> - Download files from mongodb cluster")
     print("ls or list - View file list in mongodb cluster")
     print("rm or remove <file_sha256> - Remove files from mongodb cluster")
-    print("re or reindex - Reallocate storage space")
     print("se or search <keyword> - Search files")
     print("exit - Exit the program")
 
@@ -22,28 +21,39 @@ def parse_input(user_input, client_list):
     user_input = user_input.split()
     command = user_input[0]
     if command == "up" or command == "upload" and len(user_input) == 2:
-        file_path = user_input[1].strip('"').replace("\\", "/")
+        try:
+            file_path = user_input[1].strip('"').replace("\\", "/")
+        except Exception as e:
+            print_error("Invalid input")
         try:
             file_sha256 = mongo_utils.upload_file(client_list, file_path)
             print_success("The file has been uploaded and the file sha256 is:" + file_sha256)
         except Exception as e:
             print_error(e)
+
     elif command == "dl" or command == "download" and len(user_input) == 2:
-        file_sha256 = user_input[1]
-        if os.path.exists('./download') == False:
-            os.mkdir('./download')
-        save_path = "./download/"
         try:
-            file_path = mongo_utils.download_file(client_list, file_sha256, save_path)
-            if file_path:
-                print_success("The file has been downloaded and the file path is:" + file_path)
-            else:
-                print_error("File does not exist")
+            file_sha256 = user_input[1]
+        except Exception as e:
+            print_error("Invalid input")
+        try:
+            if os.path.exists('./download') == False:
+                os.mkdir('./download')
+            save_path = "./download/"
+            try:
+                file_path = mongo_utils.download_file(client_list, file_sha256, save_path)
+                if file_path:
+                    print_success("The file has been downloaded and the file path is:" + file_path)
+                else:
+                    print_error("File does not exist")
+            except Exception as e:
+                print_error(e)
         except Exception as e:
             print_error(e)
+
     elif command == "ls" or command == "list" and len(user_input) == 1:
+        file_list = mongo_utils.list_files(client_list)
         try:
-            file_list = mongo_utils.list_files(client_list)
             if file_list:
                 print_success("The file list is as follows:")
                 for file_info in file_list:
@@ -57,8 +67,12 @@ def parse_input(user_input, client_list):
                 print_error("No file")
         except Exception as e:
             print_error(e)
+
     elif command == "rm" or command == "remove" and len(user_input) == 2:
-        file_sha256 = user_input[1]
+        try:
+            file_sha256 = user_input[1]
+        except Exception as e:
+            print_error("Invalid input")
         try:
             result = mongo_utils.delete_file(client_list, file_sha256)
             if result:
@@ -67,24 +81,12 @@ def parse_input(user_input, client_list):
                 print_error("File does not exist")
         except Exception as e:
             print_error(e)
-    elif command == "re" or command == "reindex" and len(user_input) == 1:
-        confirm = input("Are you sure you want to reindex all files? This may take a long time. (y/n)")
-        if confirm == "y":
-            try:
-                result = mongo_utils.reindex_file(client_list)
-                if result:
-                    print_success("All files have been reindexed")
-                else:
-                    print_error("No file needs to be reindexed")
-            except Exception as e:
-                print_error(e)
-        elif confirm == "n":
-            print("Operation canceled")
-        else:
-            print_error("Invalid input")
 
     elif command == "se" or command == "search" and len(user_input) == 2:
-        keyword = user_input[1]
+        try:
+            keyword = user_input[1]
+        except Exception as e:
+            print_error("Invalid input")
         try:
             file_list = mongo_utils.search_file(client_list, keyword)
             if file_list:
