@@ -1,2 +1,3 @@
 pymongo
 py7zr
+pyinstaller
