@@ -11,7 +11,6 @@ def connect_mongo_cluster(uri_list):
         client_list.append(client)
     return client_list
 
-# mongo_utils.py
 def upload_file(client_list, file_path):
     with open(file_path, "rb") as f:
         file_data = f.read()
@@ -115,7 +114,7 @@ def reindex_file(client_list):
     file_list = list_files(client_list)
     for file_info in file_list:
         file_sha256 = file_info["sha256"]
-        file_path = download_file(client_list, file_sha256, "./cache")
+        file_path = download_file(client_list, file_sha256, "./cache/")
         if file_path:
             os.remove(file_path)
             delete_file(client_list, file_sha256)
