@@ -2,10 +2,11 @@ from utils import user_io
 from utils import mongo_utils
 import json
 import os
+import sys
 
 if os.path.exists('./uri_list.json') == False:
     print("uri_list.json not found")
-    exit()
+    sys.exit()
 
 else:
 
