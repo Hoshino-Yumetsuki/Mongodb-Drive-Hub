@@ -7,11 +7,10 @@ import os
 def connect_mongo_cluster(uri_list):
     client_list = []
     for uri in uri_list:
-        client = MongoClient(uri)
+        client = MongoClient(uri , maxPoolSize=1024, minPoolSize=64)
         client_list.append(client)
     return client_list
 
-# mongo_utils.py
 def upload_file(client_list, file_path):
     with open(file_path, "rb") as f:
         file_data = f.read()
@@ -108,19 +107,6 @@ def delete_file(client_list, file_sha256):
         chunk_doc = col.find_one_and_delete({"sha256": file_sha256})
         if not chunk_doc:
             result = False
-    return result
-
-def reindex_file(client_list):
-    result = False
-    file_list = list_files(client_list)
-    for file_info in file_list:
-        file_sha256 = file_info["sha256"]
-        file_path = download_file(client_list, file_sha256, "./cache")
-        if file_path:
-            os.remove(file_path)
-            delete_file(client_list, file_sha256)
-            upload_file(client_list, file_path)
-            result = True
     return result
 
 def search_file(client_list, keyword):
