@@ -39,7 +39,7 @@ def connect_mongo_cluster(uri_list):
     return client_list
 
 def upload_file(client_list, file_path):
-    file_path = os.path.abspath(file_path)  # 将相对路径转换为绝对路径
+    file_path = os.path.abspath(file_path)
 
     with open(file_path, "rb") as f:
         file_data = f.read()
@@ -167,3 +167,42 @@ def search_file(client_list, keyword):
         }
         file_list.append(file_info)
     return file_list
+
+
+def get_storage_info(client_list, selected_instance=None):
+    total_storage = 0
+    total_free_storage = 0
+    total_used_storage = 0
+    storage_info_list = []
+
+    for i, client in enumerate(client_list, start=1):
+        if selected_instance is not None and i != selected_instance:
+            continue
+
+        db = client.files
+        stats = db.command('dbstats')
+        storage_info = {
+            "total_storage": stats["storageSize"],
+            "free_storage": stats["storageSize"] - stats["dataSize"],
+            "used_storage": stats["dataSize"]
+        }
+        storage_info_list.append(storage_info)
+
+        total_storage += stats["storageSize"]
+        total_free_storage += stats["storageSize"] - stats["dataSize"]
+        total_used_storage += stats["dataSize"]
+
+        if selected_instance is not None:
+            break
+
+    if selected_instance is None:
+        storage_info_list = [{
+            "instance_uri": "All Instances",
+            "total_storage": total_storage,
+            "free_storage": total_free_storage,
+            "used_storage": total_used_storage
+        }]
+
+    return storage_info_list
+
+

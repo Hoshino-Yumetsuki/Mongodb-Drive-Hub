@@ -9,6 +9,7 @@ def print_welcome():
     print("ls or list - View file list in mongodb cluster")
     print("rm or remove <file_sha256> - Remove files from mongodb cluster")
     print("se or search <keyword> - Search files")
+    print("fs - Show storage information of MongoDB instances")
     print("exit - Exit the program")
 
 def print_error(error):
@@ -30,7 +31,7 @@ def parse_input(user_input, client_list):
             print_error("Invalid command or argument")
         try:
             file_sha256 = mongo_utils.upload_file(client_list, file_path)
-            print_success("The file has been uploaded and the file sha256 is:" + file_sha256)
+            print_success("\nThe file has been uploaded and the file sha256 is:" + file_sha256)
         except Exception as e:
             print_error(e)
     elif command == "dl" or command == "download" and len(user_input) == 2:
@@ -44,7 +45,7 @@ def parse_input(user_input, client_list):
         try:
             file_path = mongo_utils.download_file(client_list, file_sha256, save_path)
             if file_path:
-                print_success("The file has been downloaded and the file path is:" + file_path)
+                print_success("\nThe file has been downloaded and the file path is:" + file_path)
             else:
                 print_error("File does not exist")
         except Exception as e:
@@ -53,7 +54,7 @@ def parse_input(user_input, client_list):
         try:
             file_list = mongo_utils.list_files(client_list)
             if file_list:
-                print_success("The file list is as follows:")
+                print_success("\nThe file list is as follows:")
                 for file_info in file_list:
                     print("File path:", file_info["path"])
                     print("File name:", file_info["name"])
@@ -87,7 +88,7 @@ def parse_input(user_input, client_list):
         try:
             file_list = mongo_utils.search_file(client_list, keyword)
             if file_list:
-                print_success("The search results are as follows:")
+                print_success("\nThe search results are as follows:")
                 for file_info in file_list:
                     print("File path:", file_info["path"])
                     print("File name:", file_info["name"])
@@ -99,7 +100,25 @@ def parse_input(user_input, client_list):
                 print_error("No file matches the keyword")
         except Exception as e:
             print_error(e)
+    elif command == "fs" and len(user_input) in (1, 2):
+        if len(user_input) == 1:
+            storage_info_list = mongo_utils.get_storage_info(client_list)
+        else:
+            try:
+                selected_instance = int(user_input[1])
+                storage_info_list = mongo_utils.get_storage_info(client_list, selected_instance)
+            except ValueError:
+                print_error("Invalid instance order. Please provide a valid integer.")
 
+        if storage_info_list:
+            print_success("\nStorage information:")
+            for storage_info in storage_info_list:
+                print("Total Storage:", storage_info["total_storage"])
+                print("Free Storage:", storage_info["free_storage"])
+                print("Used Storage:", storage_info["used_storage"])
+                print("--------------------")
+        else:
+            print_error("Failed to retrieve storage information")
     elif command == "exit":
         sys.exit()
     else:
