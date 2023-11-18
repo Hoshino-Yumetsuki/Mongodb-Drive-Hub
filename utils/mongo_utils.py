@@ -3,6 +3,33 @@ import hashlib
 from pymongo import MongoClient
 import py7zr
 import os
+from threading import Lock
+import traceback
+import logging
+
+logging.basicConfig(level=logging.INFO)
+
+lock = Lock()
+
+def upload_wrapper(args):
+    client_list, file_path = args
+    try:
+        with lock:
+            upload_result = upload_file(client_list, file_path)
+        return upload_result
+    except Exception as e:
+        logging.error(f"Error uploading file: {file_path}\n{traceback.format_exc()}")
+        return None
+
+def download_wrapper(args):
+    client_list, file_sha256, save_path = args
+    try:
+        with lock:
+            download_result = download_file(client_list, file_sha256, save_path)
+        return download_result
+    except Exception as e:
+        logging.error(f"Error downloading file: {file_sha256}\n{traceback.format_exc()}")
+        return None
 
 def connect_mongo_cluster(uri_list):
     client_list = []
@@ -12,19 +39,26 @@ def connect_mongo_cluster(uri_list):
     return client_list
 
 def upload_file(client_list, file_path):
+    file_path = os.path.abspath(file_path)  # 将相对路径转换为绝对路径
+
     with open(file_path, "rb") as f:
         file_data = f.read()
+
     file_sha256 = hashlib.sha256(file_data).hexdigest()
     file_name, file_ext = os.path.basename(file_path).split(".")
     file_size = os.path.getsize(file_path)
     file_7z_path = file_path + ".7z"
+
     with py7zr.SevenZipFile(file_7z_path, 'w') as archive:
         archive.write(file_path, file_name + "." + file_ext)
+
     file_7z_size = os.path.getsize(file_7z_path)
     file_7z_data = open(file_7z_path, "rb").read()
     os.remove(file_7z_path)
+
     num_of_clients = len(client_list)
     chunk_size = file_7z_size // num_of_clients
+
     for i in range(num_of_clients):
         client = client_list[i]
         db = client["files"]
@@ -34,6 +68,7 @@ def upload_file(client_list, file_path):
         chunk_data = file_7z_data[start:end]
         chunk_data_b64 = base64.b64encode(chunk_data)
         chunk_sha256 = hashlib.sha256(chunk_data).hexdigest()
+
         chunk_doc = {
             "name": file_name,
             "ext": file_ext,
@@ -45,8 +80,8 @@ def upload_file(client_list, file_path):
             "chunk_sha256": chunk_sha256
         }
         col.insert_one(chunk_doc)
-    return file_sha256
 
+    return file_sha256
 
 def download_file(client_list, file_sha256, save_path):
     file_7z_data = b""
@@ -68,9 +103,11 @@ def download_file(client_list, file_sha256, save_path):
             file_7z_data += chunk_data
         else:
             return None
+
     file_7z_path = save_path + file_name + "." + file_ext + ".7z"
     with open(file_7z_path, "wb") as f:
         f.write(file_7z_data)
+
     with py7zr.SevenZipFile(file_7z_path, 'r') as archive:
         archive.extractall(save_path)
     os.remove(file_7z_path)

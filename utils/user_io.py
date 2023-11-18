@@ -12,22 +12,22 @@ def print_welcome():
     print("exit - Exit the program")
 
 def print_error(error):
-    print("An error occurred：", error)
+    print("An error occurred:", error)
 
 def print_success(message):
-    print("Successful operation：", message)
+    print("Successful operation:", message)
 
 def parse_input(user_input, client_list):
     user_input = user_input.split()
     try:
         command = user_input[0]
     except Exception as e:
-           print_error("Invalid command or argument")
+        print_error("Invalid command or argument")
     if command == "up" or command == "upload" and len(user_input) == 2:
         try:
             file_path = user_input[1].strip('"').replace("\\", "/")
         except Exception as e:
-           print_error("Invalid command or argument")
+            print_error("Invalid command or argument")
         try:
             file_sha256 = mongo_utils.upload_file(client_list, file_path)
             print_success("The file has been uploaded and the file sha256 is:" + file_sha256)
@@ -37,7 +37,7 @@ def parse_input(user_input, client_list):
         try:
             file_sha256 = user_input[1]
         except Exception as e:
-           print_error("Invalid command or argument")
+            print_error("Invalid command or argument")
         if os.path.exists('./download') == False:
             os.mkdir('./download')
         save_path = "./download/"
@@ -69,7 +69,7 @@ def parse_input(user_input, client_list):
         try:
             file_sha256 = user_input[1]
         except Exception as e:
-           print_error("Invalid command or argument")
+            print_error("Invalid command or argument")
         try:
             result = mongo_utils.delete_file(client_list, file_sha256)
             if result:
@@ -83,7 +83,7 @@ def parse_input(user_input, client_list):
         try:
             keyword = user_input[1]
         except Exception as e:
-           print_error("Invalid command or argument")
+            print_error("Invalid command or argument")
         try:
             file_list = mongo_utils.search_file(client_list, keyword)
             if file_list:
