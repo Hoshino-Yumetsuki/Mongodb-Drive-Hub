@@ -11,7 +11,8 @@ def print_welcome():
     print("ls or list - View file list in mongodb cluster")
     print("rm or remove <file_sha256> - Remove files from mongodb cluster")
     print("se or search <keyword> - Search files")
-    print("re - Reallocate storage space")
+    print("re or reindex - Reallocate storage space")
+    print("ds or dbstatus - Show database status")
     print("fs - Show storage information of MongoDB instances")
     print("exit - Exit the program")
 
