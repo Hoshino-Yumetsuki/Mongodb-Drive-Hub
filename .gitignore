@@ -1,6 +1,7 @@
 __pycache__
 download
-uri_list.json
+*.json
 dist
 build
 *.spec
+cache
