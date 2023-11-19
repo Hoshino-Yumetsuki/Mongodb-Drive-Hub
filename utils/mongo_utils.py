@@ -35,7 +35,7 @@ def download_wrapper(args):
 def connect_mongo_cluster(uri_list):
     client_list = []
     def connect(uri):
-        return MongoClient(uri, maxPoolSize=1024, minPoolSize=64)
+        return MongoClient(uri, maxPoolSize=16)
     with ThreadPoolExecutor() as executor:
         futures = [executor.submit(connect, uri) for uri in uri_list]
         for future in futures:
@@ -212,3 +212,24 @@ def reindex_files(client_list, save_path='./cache'):
         if downloaded_file_path:
             upload_file(client_list, downloaded_file_path)
         os.remove(downloaded_file_path)
+
+def dbstatus(client_list):
+    status_result = {}
+
+    for i, client in enumerate(client_list, start=1):
+        try:
+            db = client.test
+            db.command('ping')
+            status_result[f"<db{i}>"] = "connected"
+        except Exception as e:
+            status_result[f"<db{i}>"] = "disconnected"
+
+    return status_result
+
+def retry_connect(client_list, db_name):
+    try:
+        client = MongoClient(db_name, maxPoolSize=16)
+        client_list.append(client)
+        return True
+    except Exception as e:
+        return False

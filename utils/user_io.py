@@ -2,6 +2,7 @@ import sys
 import os
 from . import mongo_utils
 from time import sleep
+import json
 
 def print_welcome():
     print("You can use the following commands to manipulate files:")
@@ -27,6 +28,7 @@ def parse_input(user_input, client_list):
             command = user_input[0]
         except Exception as e:
             print_error("Invalid command or argument")
+
         if command == "up" or command == "upload" and len(user_input) == 2:
             try:
                 file_path = user_input[1].strip('"').replace("\\", "/")
@@ -37,6 +39,7 @@ def parse_input(user_input, client_list):
                 print_success("\nThe file has been uploaded and the file sha256 is:" + file_sha256)
             except Exception as e:
                 print_error(e)
+
         elif command == "dl" or command == "download" and len(user_input) == 2:
             try:
                 file_sha256 = user_input[1]
@@ -53,6 +56,7 @@ def parse_input(user_input, client_list):
                     print_error("File does not exist")
             except Exception as e:
                 print_error(e)
+
         elif command == "ls" or command == "list" and len(user_input) == 1:
             try:
                 file_list = mongo_utils.list_files(client_list)
@@ -69,6 +73,7 @@ def parse_input(user_input, client_list):
                     print_error("No file")
             except Exception as e:
                 print_error(e)
+
         elif command == "rm" or command == "remove" and len(user_input) == 2:
             try:
                 file_sha256 = user_input[1]
@@ -103,6 +108,7 @@ def parse_input(user_input, client_list):
                     print_error("No file matches the keyword")
             except Exception as e:
                 print_error(e)
+
         elif command == "fs" and len(user_input) in (1, 2):
             if len(user_input) == 1:
                 storage_info_list = mongo_utils.get_storage_info(client_list)
@@ -112,7 +118,6 @@ def parse_input(user_input, client_list):
                     storage_info_list = mongo_utils.get_storage_info(client_list, selected_instance)
                 except ValueError:
                     print_error("Invalid instance order. Please provide a valid integer.")
-
             if storage_info_list:
                 print_success("\nStorage information:")
                 for storage_info in storage_info_list:
@@ -122,6 +127,7 @@ def parse_input(user_input, client_list):
                     print("--------------------")
             else:
                 print_error("Failed to retrieve storage information")
+
         elif command == "re" or command == "reindex" and len(user_input) == 1:
             confirmation = input("Are you sure you want to reindex all files? This will download and re-upload all files. (y/n): ").lower()
             if confirmation == 'yes' or confirmation == 'y':
@@ -133,10 +139,26 @@ def parse_input(user_input, client_list):
                     print_error(e)
             else:
                 print("Reindex operation canceled.")
+
+        elif command == "ds" or command == "dbstatus" and len(user_input) == 1:
+            try:
+                status_result = mongo_utils.dbstatus(client_list)
+                print(json.dumps({"status": status_result}, indent=2))
+                for db_name, status in status_result.items():
+                    if status == "disconnected":
+                        print(f"retrying connect {db_name} ...")
+                        if mongo_utils.retry_connect(client_list, db_name):
+                            print("connected successful")
+                        else:
+                            print("connection failed")
+            except Exception as e:
+                print_error("Error during dbstatus.")
+                print_error(e)
+
         elif command == "exit":
             sys.exit()
+
         else:
             print_error("Invalid command or argument")
-
     except Exception as e:
         sleep(0)
