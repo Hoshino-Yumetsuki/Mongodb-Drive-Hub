@@ -59,21 +59,14 @@ def parse_input(user_input, client_list):
                 print_error(e)
 
         elif command == "ls" or command == "list" and len(user_input) == 1:
-            try:
-                file_list = mongo_utils.list_files(client_list)
-                if file_list:
-                    print_success("\nThe file list is as follows:")
-                    for file_info in file_list:
-                        print("File path:", file_info["path"])
-                        print("File name:", file_info["name"])
-                        print("File size:", file_info["size"])
-                        print("File sha256:", file_info["sha256"])
-                        print("Total chunks:", file_info["total_chunks"])
-                        print("--------------------")
-                else:
-                    print_error("No file")
-            except Exception as e:
-                print_error(e)
+                try:
+                    file_list = mongo_utils.list_files(client_list)
+                    if file_list:
+                        print(json.dumps(file_list, indent=2))
+                    else:
+                        print_error("No file")
+                except Exception as e:
+                    print_error(e)
 
         elif command == "rm" or command == "remove" and len(user_input) == 2:
             try:
@@ -90,25 +83,18 @@ def parse_input(user_input, client_list):
                 print_error(e)
 
         elif command == "se" or command == "search" and len(user_input) == 2:
-            try:
-                keyword = user_input[1]
-            except Exception as e:
-                print_error("Invalid command or argument")
-            try:
-                file_list = mongo_utils.search_file(client_list, keyword)
-                if file_list:
-                    print_success("\nThe search results are as follows:")
-                    for file_info in file_list:
-                        print("File path:", file_info["path"])
-                        print("File name:", file_info["name"])
-                        print("File size:", file_info["size"])
-                        print("File sha256:", file_info["sha256"])
-                        print("Total chunks:", file_info["total_chunks"])
-                        print("--------------------")
-                else:
-                    print_error("No file matches the keyword")
-            except Exception as e:
-                print_error(e)
+                try:
+                    keyword = user_input[1]
+                except Exception as e:
+                    print_error("Invalid command or argument")
+                try:
+                    file_list = mongo_utils.search_file(client_list, keyword)
+                    if file_list:
+                        print(json.dumps(file_list, indent=2))
+                    else:
+                        print_error("No file matches the keyword")
+                except Exception as e:
+                    print_error(e)
 
         elif command == "fs" and len(user_input) in (1, 2):
             if len(user_input) == 1:
@@ -119,15 +105,12 @@ def parse_input(user_input, client_list):
                     storage_info_list = mongo_utils.get_storage_info(client_list, selected_instance)
                 except ValueError:
                     print_error("Invalid instance order. Please provide a valid integer.")
+
             if storage_info_list:
-                print_success("\nStorage information:")
-                for storage_info in storage_info_list:
-                    print("Total Storage:", storage_info["total_storage"])
-                    print("Free Storage:", storage_info["free_storage"])
-                    print("Used Storage:", storage_info["used_storage"])
-                    print("--------------------")
+                print(json.dumps(storage_info_list, indent=2))
             else:
                 print_error("Failed to retrieve storage information")
+
 
         elif command == "re" or command == "reindex" and len(user_input) == 1:
             confirmation = input("Are you sure you want to reindex all files? This will download and re-upload all files. (y/n): ").lower()
@@ -145,13 +128,6 @@ def parse_input(user_input, client_list):
             try:
                 status_result = mongo_utils.dbstatus(client_list)
                 print(json.dumps({"status": status_result}, indent=2))
-                for db_name, status in status_result.items():
-                    if status == "disconnected":
-                        print(f"retrying connect {db_name} ...")
-                        if mongo_utils.retry_connect(client_list, db_name):
-                            print("connected successful")
-                        else:
-                            print("connection failed")
             except Exception as e:
                 print_error("Error during dbstatus.")
                 print_error(e)

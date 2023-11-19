@@ -130,6 +130,7 @@ def list_files(client_list):
             "total_chunks": total_chunks
         }
         file_list.append(file_info)
+
     return file_list
 
 def delete_file(client_list, file_sha256):
@@ -166,38 +167,46 @@ def search_file(client_list, keyword):
             "total_chunks": total_chunks
         }
         file_list.append(file_info)
+
     return file_list
+
 
 def get_storage_info(client_list, selected_instance=None):
     total_storage = 0
     total_free_storage = 0
     total_used_storage = 0
     storage_info_list = []
+
     for i, client in enumerate(client_list, start=1):
         if selected_instance is not None and i != selected_instance:
             continue
+
         db = client.files
         stats = db.command('dbstats')
         storage_info = {
+            "instance_uri": client.address[0],
             "total_storage": stats["storageSize"],
             "free_storage": stats["storageSize"] - stats["dataSize"],
             "used_storage": stats["dataSize"]
         }
         storage_info_list.append(storage_info)
+
         total_storage += stats["storageSize"]
         total_free_storage += stats["storageSize"] - stats["dataSize"]
         total_used_storage += stats["dataSize"]
 
         if selected_instance is not None:
             break
+
     if selected_instance is None:
-        storage_info_list = [{
-            "instance_uri": "All Instances",
+        storage_info_list = {
             "total_storage": total_storage,
             "free_storage": total_free_storage,
             "used_storage": total_used_storage
-        }]
+        }
+
     return storage_info_list
+
 
 def reindex_files(client_list, save_path='./cache'):
     if not os.path.exists(save_path):
@@ -216,13 +225,15 @@ def reindex_files(client_list, save_path='./cache'):
 def dbstatus(client_list):
     status_result = {}
 
-    for i, client in enumerate(client_list, start=1):
+    for client in client_list:
+        uri = client.address[0]
         try:
+            # 使用 db.command('ping') 或其他适当的方法检测数据库是否掉线
             db = client.test
             db.command('ping')
-            status_result[f"<db{i}>"] = "connected"
+            status_result[uri] = "connected"
         except Exception as e:
-            status_result[f"<db{i}>"] = "disconnected"
+            status_result[uri] = "disconnected"
 
     return status_result
 
