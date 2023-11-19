@@ -62,7 +62,7 @@ def parse_input(user_input, client_list):
                 try:
                     file_list = mongo_utils.list_files(client_list)
                     if file_list:
-                        print(json.dumps(file_list, indent=2))
+                        print(json.dumps(file_list, indent=2, ensure_ascii=False))
                     else:
                         print_error("No file")
                 except Exception as e:
@@ -90,7 +90,7 @@ def parse_input(user_input, client_list):
                 try:
                     file_list = mongo_utils.search_file(client_list, keyword)
                     if file_list:
-                        print(json.dumps(file_list, indent=2))
+                        print(json.dumps(file_list, indent=2, ensure_ascii=False))
                     else:
                         print_error("No file matches the keyword")
                 except Exception as e:
@@ -107,7 +107,7 @@ def parse_input(user_input, client_list):
                     print_error("Invalid instance order. Please provide a valid integer.")
 
             if storage_info_list:
-                print(json.dumps(storage_info_list, indent=2))
+                print(json.dumps(storage_info_list, indent=2, ensure_ascii=False))
             else:
                 print_error("Failed to retrieve storage information")
 
@@ -127,7 +127,7 @@ def parse_input(user_input, client_list):
         elif command == "ds" or command == "dbstatus" and len(user_input) == 1:
             try:
                 status_result = mongo_utils.dbstatus(client_list)
-                print(json.dumps({"status": status_result}, indent=2))
+                print(json.dumps({"status": status_result}, indent=2, ensure_ascii=False))
             except Exception as e:
                 print_error("Error during dbstatus.")
                 print_error(e)
