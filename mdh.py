@@ -5,12 +5,13 @@ import os
 import traceback
 import logging
 from concurrent.futures import ThreadPoolExecutor
+import sys
 
 if __name__ == "__main__":
     try:
         if os.path.exists('./uri_list.json') == False:
             print("uri_list.json not found")
-            exit()
+            sys.exit()
         with open("uri_list.json", "r") as f:
             uri_list = json.load(f)["uri_list"]
         client_list = mongo_utils.connect_mongo_cluster(uri_list)

@@ -228,7 +228,6 @@ def dbstatus(client_list):
     for client in client_list:
         uri = client.address[0]
         try:
-            # 使用 db.command('ping') 或其他适当的方法检测数据库是否掉线
             db = client.test
             db.command('ping')
             status_result[uri] = "connected"
