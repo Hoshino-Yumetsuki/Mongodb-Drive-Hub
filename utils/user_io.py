@@ -2,7 +2,7 @@ import sys
 import os
 from . import mongo_utils
 from time import sleep
-import json
+import tabulate
 
 def print_welcome():
     print("You can use the following commands to manipulate files:")
@@ -11,16 +11,14 @@ def print_welcome():
     print("ls or list - View file list in mongodb cluster")
     print("rm or remove <file_sha256> - Remove files from mongodb cluster")
     print("se or search <keyword> - Search files")
-    print("re or reindex - Reallocate storage space")
-    print("ds or dbstatus - Show database status")
     print("fs - Show storage information of MongoDB instances")
     print("exit - Exit the program")
 
 def print_error(error):
-    print("An error occurred:", error)
+    print(f"Error: {error}")
 
 def print_success(message):
-    print("Successful operation:", message)
+    print(f"Successful operation: {message}")
 
 def parse_input(user_input, client_list):
     user_input = user_input.split()
@@ -37,7 +35,7 @@ def parse_input(user_input, client_list):
                 print_error("Invalid command or argument")
             try:
                 file_sha256 = mongo_utils.upload_file(client_list, file_path)
-                print_success("\nThe file has been uploaded and the file sha256 is:" + file_sha256)
+                print_success(f"\nThe file has been uploaded and the file sha256 is: {file_sha256}")
             except Exception as e:
                 print_error(e)
 
@@ -52,21 +50,23 @@ def parse_input(user_input, client_list):
             try:
                 file_path = mongo_utils.download_file(client_list, file_sha256, save_path)
                 if file_path:
-                    print_success("\nThe file has been downloaded and the file path is:" + file_path)
+                    print_success(f"\nThe file has been downloaded and the file path is: {file_path}")
                 else:
                     print_error("File does not exist")
             except Exception as e:
                 print_error(e)
 
         elif command == "ls" or command == "list" and len(user_input) == 1:
-                try:
-                    file_list = mongo_utils.list_files(client_list)
-                    if file_list:
-                        print(json.dumps(file_list, indent=2, ensure_ascii=False))
-                    else:
-                        print_error("No file")
-                except Exception as e:
-                    print_error(e)
+            try:
+                file_list = mongo_utils.list_files(client_list, cli_output=False)
+                if file_list:
+                    headers = ["Name", "Size", "SHA256", "Total Chunks"]
+                    table_data = [(f["name"], f["size"], f["sha256"], f["total_chunks"]) for f in file_list]
+                    print(tabulate.tabulate(table_data, headers=headers, tablefmt="grid"))
+                else:
+                    print_error("No file")
+            except Exception as e:
+                print_error(e)
 
         elif command == "rm" or command == "remove" and len(user_input) == 2:
             try:
@@ -83,34 +83,32 @@ def parse_input(user_input, client_list):
                 print_error(e)
 
         elif command == "se" or command == "search" and len(user_input) == 2:
-                try:
-                    keyword = user_input[1]
-                except Exception as e:
-                    print_error("Invalid command or argument")
-                try:
-                    file_list = mongo_utils.search_file(client_list, keyword)
-                    if file_list:
-                        print(json.dumps(file_list, indent=2, ensure_ascii=False))
-                    else:
-                        print_error("No file matches the keyword")
-                except Exception as e:
-                    print_error(e)
+            try:
+                keyword = user_input[1]
+            except Exception as e:
+                print_error("Invalid command or argument")
+            try:
+                file_list = mongo_utils.search_file(client_list, keyword, cli_output=False)
+                if file_list:
+                    headers = ["Name", "Size", "SHA256", "Total Chunks"]
+                    table_data = [(f["name"], f["size"], f["sha256"], f["total_chunks"]) for f in file_list]
+                    print(tabulate.tabulate(table_data, headers=headers, tablefmt="grid"))
+                else:
+                    print_error("No file matches the keyword")
+            except Exception as e:
+                print_error(e)
 
         elif command == "fs" and len(user_input) in (1, 2):
-            if len(user_input) == 1:
-                storage_info_list = mongo_utils.get_storage_info(client_list)
-            else:
-                try:
-                    selected_instance = int(user_input[1])
-                    storage_info_list = mongo_utils.get_storage_info(client_list, selected_instance)
-                except ValueError:
-                    print_error("Invalid instance order. Please provide a valid integer.")
-
-            if storage_info_list:
-                print(json.dumps(storage_info_list, indent=2, ensure_ascii=False))
-            else:
-                print_error("Failed to retrieve storage information")
-
+            try:
+                storage_info_list = mongo_utils.get_storage_info(client_list, cli_output=False)
+                if storage_info_list:
+                    headers = ["Instance URI", "Total Storage", "Free Storage", "Used Storage"]
+                    table_data = [(info["instance_uri"], info["total_storage"], info["free_storage"], info["used_storage"]) for info in storage_info_list]
+                    print(tabulate.tabulate(table_data, headers=headers, tablefmt="grid"))
+                else:
+                    print_error("Failed to retrieve storage information")
+            except Exception as e:
+                print_error(e)
 
         elif command == "re" or command == "reindex" and len(user_input) == 1:
             confirmation = input("Are you sure you want to reindex all files? This will download and re-upload all files. (y/n): ").lower()
@@ -126,8 +124,13 @@ def parse_input(user_input, client_list):
 
         elif command == "ds" or command == "dbstatus" and len(user_input) == 1:
             try:
-                status_result = mongo_utils.dbstatus(client_list)
-                print(json.dumps({"status": status_result}, indent=2, ensure_ascii=False))
+                status_result = mongo_utils.dbstatus(client_list, cli_output=False)
+                if status_result:
+                    headers = ["Instance URI", "Status"]
+                    table_data = [(uri, status) for uri, status in status_result.items()]
+                    print(tabulate.tabulate(table_data, headers=headers, tablefmt="grid"))
+                else:
+                    print_error("Failed to retrieve database status")
             except Exception as e:
                 print_error("Error during dbstatus.")
                 print_error(e)

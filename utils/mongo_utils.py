@@ -7,6 +7,7 @@ from threading import Lock
 import traceback
 import logging
 from concurrent.futures import ThreadPoolExecutor
+import tabulate
 
 logging.basicConfig(level=logging.INFO)
 
@@ -110,7 +111,7 @@ def download_file(client_list, file_sha256, save_path):
     file_path = os.path.join(save_path, f"{file_name}.{file_ext}")
     return file_path
 
-def list_files(client_list):
+def list_files(client_list, cli_output=True):
     file_list = []
     client = client_list[0]
     db = client["files"]
@@ -131,7 +132,12 @@ def list_files(client_list):
         }
         file_list.append(file_info)
 
-    return file_list
+    if cli_output:
+        headers = ["Name", "Size", "SHA256", "Total Chunks"]
+        table_data = [(f["name"], f["size"], f["sha256"], f["total_chunks"]) for f in file_list]
+        print(tabulate.tabulate(table_data, headers=headers, tablefmt="grid"))
+    else:
+        return file_list
 
 def delete_file(client_list, file_sha256):
     total_clients = len(client_list)
@@ -147,7 +153,7 @@ def delete_file(client_list, file_sha256):
     else:
         return False
 
-def search_file(client_list, keyword):
+def search_file(client_list, keyword, cli_output=True):
     file_list = []
     client = client_list[0]
     db = client["files"]
@@ -168,10 +174,14 @@ def search_file(client_list, keyword):
         }
         file_list.append(file_info)
 
-    return file_list
+    if cli_output:
+        headers = ["Name", "Size", "SHA256", "Total Chunks"]
+        table_data = [(f["name"], f["size"], f["sha256"], f["total_chunks"]) for f in file_list]
+        print(tabulate.tabulate(table_data, headers=headers, tablefmt="grid"))
+    else:
+        return file_list
 
-
-def get_storage_info(client_list, selected_instance=None):
+def get_storage_info(client_list, selected_instance=None, cli_output=True):
     total_storage = 0
     total_free_storage = 0
     total_used_storage = 0
@@ -205,13 +215,17 @@ def get_storage_info(client_list, selected_instance=None):
             "used_storage": total_used_storage
         }
 
-    return storage_info_list
-
+    if cli_output:
+        headers = ["Instance URI", "Total Storage", "Free Storage", "Used Storage"]
+        table_data = [(info["instance_uri"], info["total_storage"], info["free_storage"], info["used_storage"]) for info in storage_info_list]
+        print(tabulate.tabulate(table_data, headers=headers, tablefmt="grid"))
+    else:
+        return storage_info_list
 
 def reindex_files(client_list, save_path='./cache'):
     if not os.path.exists(save_path):
         os.makedirs(save_path)
-    file_list = list_files(client_list)
+    file_list = list_files(client_list, cli_output=False)
     for file_info in file_list:
         file_sha256 = file_info["sha256"]
         file_name = file_info["name"]
@@ -222,7 +236,7 @@ def reindex_files(client_list, save_path='./cache'):
             upload_file(client_list, downloaded_file_path)
         os.remove(downloaded_file_path)
 
-def dbstatus(client_list):
+def dbstatus(client_list, cli_output=True):
     status_result = {}
 
     for client in client_list:
@@ -234,7 +248,12 @@ def dbstatus(client_list):
         except Exception as e:
             status_result[uri] = "disconnected"
 
-    return status_result
+    if cli_output:
+        headers = ["Instance URI", "Status"]
+        table_data = [(uri, status) for uri, status in status_result.items()]
+        print(tabulate.tabulate(table_data, headers=headers, tablefmt="grid"))
+    else:
+        return status_result
 
 def retry_connect(client_list, db_name):
     try:
