@@ -51,6 +51,13 @@ def upload_file(client_list, file_path):
     file_sha256 = hashlib.sha256(file_data).hexdigest()
     file_name, file_ext = os.path.basename(file_path).split(".")
     file_size = os.path.getsize(file_path)
+    if file_size < 1024:
+        file_size = f"{(file_size)} B"
+    elif file_size > 1024:
+        file_size = f"{round(file_size / 1024)} KB"
+    elif file_size > 1024 * 1024:
+        file_size = f"{round(file_size / 1024 / 1024)} MB"
+    else: file_size = f"{round(file_size / 1024 / 1024 / 1024)} GB"
     file_7z_path = file_path + ".7z"
     with py7zr.SevenZipFile(file_7z_path, 'w') as archive:
         archive.write(file_path, file_name + "." + file_ext)
@@ -180,47 +187,6 @@ def search_file(client_list, keyword, cli_output=True):
         print(tabulate.tabulate(table_data, headers=headers, tablefmt="grid"))
     else:
         return file_list
-
-def get_storage_info(client_list, selected_instance=None, cli_output=True):
-    total_storage = 0
-    total_free_storage = 0
-    total_used_storage = 0
-    storage_info_list = []
-
-    for i, client in enumerate(client_list, start=1):
-        if selected_instance is not None and i != selected_instance:
-            continue
-
-        db = client.files
-        stats = db.command('dbstats')
-        storage_info = {
-            "instance_uri": client.address[0],
-            "total_storage": stats["storageSize"],
-            "free_storage": stats["storageSize"] - stats["dataSize"],
-            "used_storage": stats["dataSize"]
-        }
-        storage_info_list.append(storage_info)
-
-        total_storage += stats["storageSize"]
-        total_free_storage += stats["storageSize"] - stats["dataSize"]
-        total_used_storage += stats["dataSize"]
-
-        if selected_instance is not None:
-            break
-
-    if selected_instance is None:
-        storage_info_list = {
-            "total_storage": total_storage,
-            "free_storage": total_free_storage,
-            "used_storage": total_used_storage
-        }
-
-    if cli_output:
-        headers = ["Instance URI", "Total Storage", "Free Storage", "Used Storage"]
-        table_data = [(info["instance_uri"], info["total_storage"], info["free_storage"], info["used_storage"]) for info in storage_info_list]
-        print(tabulate.tabulate(table_data, headers=headers, tablefmt="grid"))
-    else:
-        return storage_info_list
 
 def reindex_files(client_list, save_path='./cache'):
     if not os.path.exists(save_path):

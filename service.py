@@ -13,6 +13,8 @@ client_list = []
 
 def remove_temp_files():
     save_path = "./cache/"
+    if not os.path.exists(save_path):
+        os.makedirs(save_path)
     for file_name in os.listdir(save_path):
         file_path = os.path.join(save_path, file_name)
         try:
@@ -43,15 +45,6 @@ def run_cli_mode():
         logging.error(f"An unexpected error occurred: {str(e)}\n{traceback.format_exc()}")
 
 app = Flask(__name__, instance_relative_config=True, template_folder='templates')
-
-def remove_temp_files():
-    save_path = "./cache/"
-    for file_name in os.listdir(save_path):
-        file_path = os.path.join(save_path, file_name)
-        try:
-            os.unlink(file_path)
-        except Exception as e:
-            logging.warning(f"Error removing temporary file: {str(e)}")
 
 @app.route('/')
 def list_files():

@@ -98,18 +98,6 @@ def parse_input(user_input, client_list):
             except Exception as e:
                 print_error(e)
 
-        elif command == "fs" and len(user_input) in (1, 2):
-            try:
-                storage_info_list = mongo_utils.get_storage_info(client_list, cli_output=False)
-                if storage_info_list:
-                    headers = ["Instance URI", "Total Storage", "Free Storage", "Used Storage"]
-                    table_data = [(info["instance_uri"], info["total_storage"], info["free_storage"], info["used_storage"]) for info in storage_info_list]
-                    print(tabulate.tabulate(table_data, headers=headers, tablefmt="grid"))
-                else:
-                    print_error("Failed to retrieve storage information")
-            except Exception as e:
-                print_error(e)
-
         elif command == "re" or command == "reindex" and len(user_input) == 1:
             confirmation = input("Are you sure you want to reindex all files? This will download and re-upload all files. (y/n): ").lower()
             if confirmation == 'yes' or confirmation == 'y':
