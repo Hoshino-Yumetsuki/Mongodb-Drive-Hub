@@ -1,0 +1,16 @@
+.panai-container {
+  z-index: 99999 !important;
+}
+.panai-popup {
+  font-size: 14px !important;
+}
+.panai-setting-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 20px;
+}
+.panai-setting-checkbox {
+  width: 16px;
+  height: 16px;
+}

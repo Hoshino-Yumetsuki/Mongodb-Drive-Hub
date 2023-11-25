@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html class="wf-lato-n4-active wf-active">
+  <head>
+    <title>STATUS</title>
+    <link rel="stylesheet" href="../static/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="../static/css/style.css" />
+    <script src="../static/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="../static/fontawesome-6/css/all.min.css" />
+    <script src="../static/js/jquery.min.js"></script>
+    <script src="../static/js/vue.global.js"></script>
+    <script src="../static/js/vuetify.min.js"></script>
+    <script src="../static/js/markup.min.js"></script>
+    <script src="../static/js/webfont.js"></script>
+    <script src="../static/js/thuhidden.js"></script>
+    <script src="../static/fontawesome-6/js/all.min.js"></script>
+    <link rel="stylesheet" href="../static/css/swal-pub-style.css" />
+    <link rel="stylesheet" href="../static/css/panai-style.css" />
+    <link rel="icon" href="../static/img/favicon.ico" type="image/x-icon" />
+  </head>
+  <body>
+    <div class="navbar navbar-default" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse"><span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span></button>
+          <a class="navbar-brand" href="/">
+            <span>
+              <picture>
+                <source srcset="/static/img/logo-small-dark.png 1x, /static/img/logo-small-dark@2x.png 2x, /static/img/logo-small-dark@3x.png 3x, /static/img/logo-small-dark@4x.png 4x" media="(prefers-color-scheme: dark)" />
+                <img src="/static/img/logo-small.png" srcset="/static/img/logo-small.png 1x, /static/img/logo-small@2x.png 2x, /static/img/logo-small@3x.png 3x, /static/img/logo-small@4x.png 4x" alt="" />
+              </picture>
+              清华大学</span>开源软件镜像站
+          </a>
+        </div>
+        <div class="navbar-collapse collapse navbar-right">
+          <ul class="nav navbar-nav" role="menubar">
+            <li role="none"><a role="menuitem" href="/">HOME</a></li>
+            <li role="none" class="active"><a role="menuitem" href="/status">STATUS</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div id="file_list">
+      <div class="spacing hidden-xs"></div>
+      <div class="container">
+        <div class="row">
+          <div id="mirror-list" class="col-md-12 table-responsive">
+            <div>
+              <div class="col-md-8 col-xs-12 vbottom">
+                <h3><i class="fa-solid fa-cube"></i> Index of Mongodb storage array</h3>
+              </div>
+            </div>
+            <table id="list" class="table">
+              <thead>
+                <tr>
+                  <th style="width: 55%"><a href="?C=N&amp;O=A">URI</a>&nbsp;<a href="?C=N&amp;O=D">&nbsp;↓&nbsp;</a></th>
+                  <th style="width: 20%"><a href="?C=S&amp;O=A">Status</a>&nbsp;<a href="?C=S&amp;O=D">&nbsp;↓&nbsp;</a></th>
+                </tr>
+              </thead>
+              {% for uri, status in status_result.items() %}
+              <tbody>
+                <tr>
+                  <td class="link">{{ uri }}</td>
+                  <td class="link">{{ status }}</td>
+                </tr>
+              </tbody>
+              {% endfor %}
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      WebFont.load({ custom: { families: ["Lato"] } });
+      var lei3Po8h = ["support", ["tuna", "tsinghua", "edu", "cn"].join(".")].join("@");
+      $("a.eib1gieB")
+        .text(lei3Po8h)
+        .attr("href", ["ma", "lto:"].join("i") + lei3Po8h);
+    </script>
+    <style>
+      #list tbody td,
+      #path {
+        font-family: "Fira Code Retina", "Fira Code", "Fira Mono", "JetBrains Mono", "Source Code Pro", "Consolas", "Menlo", "Monaco", monospace;
+        font-size: 12pt;
+      }
+    </style>
+  </body>
+</html>

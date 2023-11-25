@@ -1,5 +1,5 @@
 import sys
-from utils.service import run_server_mode, run_cli_mode
+from service import run_server_mode, run_cli_mode
 
 if __name__ == "__main__":
     if "-s" in sys.argv or "--server" in sys.argv:
