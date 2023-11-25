@@ -37,11 +37,6 @@ flask
   ```
 - run python main.py
 
-#### Use cli
-
-- download cli from release
-- run ./mdh
-
 ## How to store files
 
 ![未命名](https://github.com/Anjiurine/Mongodb-Drive-Hub/assets/147403913/5d98a626-81f5-44ed-9481-6991114ab39b)
