@@ -11,7 +11,6 @@ def print_welcome():
     print("ls or list - View file list in mongodb cluster")
     print("rm or remove <file_sha256> - Remove files from mongodb cluster")
     print("se or search <keyword> - Search files")
-    print("fs - Show storage information of MongoDB instances")
     print("exit - Exit the program")
 
 def print_error(error):
