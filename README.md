@@ -13,6 +13,9 @@
 ```
 pymongo
 py7zr
+pyinstaller
+tabulate
+flask
 ```
 
 
