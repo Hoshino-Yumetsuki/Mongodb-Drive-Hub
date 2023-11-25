@@ -3,35 +3,11 @@ import hashlib
 from pymongo import MongoClient
 import py7zr
 import os
-from threading import Lock
-import traceback
 import logging
 from concurrent.futures import ThreadPoolExecutor
 import tabulate
 
 logging.basicConfig(level=logging.INFO)
-
-lock = Lock()
-
-def upload_wrapper(args):
-    client_list, file_path = args
-    try:
-        with lock:
-            upload_result = upload_file(client_list, file_path)
-        return upload_result
-    except Exception as e:
-        logging.error(f"Error uploading file: {file_path}\n{traceback.format_exc()}")
-        return None
-
-def download_wrapper(args):
-    client_list, file_sha256, save_path = args
-    try:
-        with lock:
-            download_result = download_file(client_list, file_sha256, save_path)
-        return download_result
-    except Exception as e:
-        logging.error(f"Error downloading file: {file_sha256}\n{traceback.format_exc()}")
-        return None
 
 def connect_mongo_cluster(uri_list):
     client_list = []
@@ -51,13 +27,15 @@ def upload_file(client_list, file_path):
     file_sha256 = hashlib.sha256(file_data).hexdigest()
     file_name, file_ext = os.path.basename(file_path).split(".")
     file_size = os.path.getsize(file_path)
-    if file_size < 1024:
-        file_size = f"{(file_size)} B"
-    elif file_size > 1024:
-        file_size = f"{round(file_size / 1024)} KB"
+
+    if file_size > 1024 * 1024 * 512:
+        file_size = f"{round(file_size / 1024 / 1024 / 1024)} GB"
     elif file_size > 1024 * 1024:
         file_size = f"{round(file_size / 1024 / 1024)} MB"
-    else: file_size = f"{round(file_size / 1024 / 1024 / 1024)} GB"
+    elif file_size > 1024:
+        file_size = f"{round(file_size / 1024)} KB"
+    else: file_size = f"{(file_size)} B"
+
     file_7z_path = file_path + ".7z"
     with py7zr.SevenZipFile(file_7z_path, 'w') as archive:
         archive.write(file_path, file_name + "." + file_ext)

@@ -98,7 +98,7 @@ def parse_input(user_input, client_list):
                 print_error(e)
 
         elif command == "re" or command == "reindex" and len(user_input) == 1:
-            confirmation = input("Are you sure you want to reindex all files? This will download and re-upload all files. (y/n): ").lower()
+            confirmation = input("Are you sure you want to reindex all files? This may take a long time. (y/n): ").lower()
             if confirmation == 'yes' or confirmation == 'y':
                 try:
                     mongo_utils.reindex_files(client_list)
