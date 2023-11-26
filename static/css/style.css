@@ -23,6 +23,14 @@
   font-weight: normal;
   text-rendering: optimizeLegibility;
 }
+@font-face {
+  font-family: "NotoSansSC-Regular";
+  src: url("../fonts/NotoSansSC-Regular.ttf") format("truetype");
+  font-style: normal;
+  font-weight: normal;
+  text-rendering: optimizeLegibility;
+}
+
 * {
   margin: 0;
 }
