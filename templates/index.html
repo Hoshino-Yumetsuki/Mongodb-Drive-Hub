@@ -56,6 +56,7 @@
                   <th style="width: 55%"><a href="?C=N&amp;O=A">File Name</a>&nbsp;<a href="?C=N&amp;O=D">&nbsp;↓&nbsp;</a></th>
                   <th style="width: 20%"><a href="?C=S&amp;O=A">File Size</a>&nbsp;<a href="?C=S&amp;O=D">&nbsp;↓&nbsp;</a></th>
                   <th style="width: 25%"><a href="?C=M&amp;O=A">SHA256</a>&nbsp;<a href="?C=M&amp;O=D">&nbsp;↓&nbsp;</a></th>
+                  <th style="width: 25%"><a href="?C=M&amp;O=A">Total Chunks</a>&nbsp;<a href="?C=M&amp;O=D">&nbsp;↓&nbsp;</a></th>
                 </tr>
               </thead>
               <tbody>
@@ -64,6 +65,7 @@
                   <td class="link"><a href="/download/{{ file.sha256 }}">{{ file.name }}</a></td>
                   <td class="link">{{ file.size }}</td>
                   <td class="link">{{ file.sha256 }}</td>
+                  <td class="link">{{ file.total_chunks }}</td>
                 </tr>
                 {% endfor %}
               </tbody>
@@ -72,13 +74,6 @@
         </div>
       </div>
     </div>
-    <script>
-      WebFont.load({ custom: { families: ["Lato"] } });
-      var lei3Po8h = ["support", ["tuna", "tsinghua", "edu", "cn"].join(".")].join("@");
-      $("a.eib1gieB")
-        .text(lei3Po8h)
-        .attr("href", ["ma", "lto:"].join("i") + lei3Po8h);
-    </script>
     <style>
       #list tbody td,
       #path {
