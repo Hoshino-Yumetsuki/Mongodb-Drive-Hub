@@ -8,6 +8,8 @@ WORKDIR /Mongodb-Drive-Hub
 
 ADD ./uri_list.json /Mongodb-Drive-Hub/uri_list.json
 
+ADD ./setup-docker.sh /Mongodb-Drive-Hub/setup-docker.sh
+
 RUN pip install -r requirements.txt
 
 EXPOSE 19198
