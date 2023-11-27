@@ -8,6 +8,7 @@ import sys
 import atexit
 import signal
 from flask import Flask, send_file, after_this_request, render_template
+from flask import jsonify
 
 client_list = []
 
@@ -47,14 +48,13 @@ def run_cli_mode():
 app = Flask(__name__, instance_relative_config=True, template_folder='templates')
 
 @app.route('/')
-def list_files():
-    file_list = mongo_utils.list_files(client_list, cli_output=False)
-    return render_template('index.html', file_list=file_list)
+def js_rendered_files():
+    return render_template('index.html')
 
 @app.route('/status')
-def dbstatus():
-    status_result = mongo_utils.dbstatus(client_list, cli_output=False)
-    return render_template('status.html', status_result=status_result)
+def js_rendered_status():
+    return render_template('status.html')
+
 
 @app.route('/download/<file_sha256>')
 def download_file(file_sha256):
@@ -72,6 +72,16 @@ def download_file(file_sha256):
             return "File does not exist", 404
     except Exception as e:
         return str(e), 500
+
+@app.route('/api/files')
+def api_list_files():
+    file_list = mongo_utils.list_files(client_list, cli_output=False)
+    return jsonify(file_list)
+
+@app.route('/api/status')
+def api_get_status():
+    status_result = mongo_utils.dbstatus(client_list, cli_output=False)
+    return jsonify(status_result)
 
 def signal_handler(sig, frame):
     print("\nProgram terminated by user.")

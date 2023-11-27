@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html class="wf-lato-n4-active wf-active">
   <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" href="../static/img/favicon.ico" type="image/x-icon" />
-    <meta name="robots" content="noindex">
+    <meta name="robots" content="noindex" />
     <title>Mongodb-Drive-Hub - HOME</title>
     <link rel="stylesheet" href="../static/css/bootstrap.min.css" />
     <link rel="stylesheet" href="../static/css/style.css" />
@@ -20,6 +20,7 @@
     <script src="../static/fontawesome-6/js/all.min.js"></script>
     <link rel="stylesheet" href="../static/css/swal-pub-style.css" />
     <link rel="stylesheet" href="../static/css/panai-style.css" />
+    <link rel="stylesheet" href="../static/css/loader.css" />
   </head>
   <body>
     <div class="navbar navbar-default" role="navigation">
@@ -27,9 +28,7 @@
         <div class="navbar-header">
           <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse"><span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span></button>
           <a class="navbar-brand" href="/">
-            <span>
-              Mongodb-Drive-Hub
-            </span>
+            <span><h2>Mongodb-Drive-Hub</h2></span>
           </a>
         </div>
         <div class="navbar-collapse collapse navbar-right">
@@ -40,46 +39,45 @@
         </div>
       </div>
     </div>
-    <div id="file_list">
+    <div id="file-list">
       <div class="spacing hidden-xs"></div>
       <div class="container">
         <div class="row">
           <div id="mirror-list" class="col-md-12 table-responsive">
+            <div class="loader-container">
+              <div class="loader"></div>
+            </div>
             <div>
               <div class="col-md-8 col-xs-12 vbottom">
                 <h3><i class="fa-solid fa-cube"></i> Index of Mongodb storage array</h3>
               </div>
             </div>
-            <table id="list" class="table">
-              <thead>
-                <tr>
-                  <th style="width: 55%"><a href="?C=N&amp;O=A">File Name</a>&nbsp;<a href="?C=N&amp;O=D">&nbsp;↓&nbsp;</a></th>
-                  <th style="width: 20%"><a href="?C=S&amp;O=A">File Size</a>&nbsp;<a href="?C=S&amp;O=D">&nbsp;↓&nbsp;</a></th>
-                  <th style="width: 25%"><a href="?C=M&amp;O=A">SHA256</a>&nbsp;<a href="?C=M&amp;O=D">&nbsp;↓&nbsp;</a></th>
-                  <th style="width: 25%"><a href="?C=M&amp;O=A">Total Chunks</a>&nbsp;<a href="?C=M&amp;O=D">&nbsp;↓&nbsp;</a></th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for file in file_list %}
-                <tr>
-                  <td class="link"><a href="/download/{{ file.sha256 }}">{{ file.name }}</a></td>
-                  <td class="link">{{ file.size }}</td>
-                  <td class="link">{{ file.sha256 }}</td>
-                  <td class="link">{{ file.total_chunks }}</td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
+            <div id="list-container"></div>
           </div>
         </div>
       </div>
     </div>
-    <style>
-      #list tbody td,
-      #path {
-        font-family: "Fira Code Retina", "Fira Code", "Fira Mono", "JetBrains Mono", "Source Code Pro", "Consolas", "Menlo", "Monaco", "monospace", "NotoSansSC-Regular";
-        font-size: 12pt;
-      }
-    </style>
+    <script>
+      $(document).ready(function () {
+        $(".loader-container").show();
+        $.get("/api/files", function (data) {
+          $(".loader-container").hide();
+          var fileList = data;
+          var tableBody = $("#list-container");
+          var tableHtml =
+            '<table id="list" class="table"><thead><tr><th style="width: 55%"><a href="?C=N&amp;O=A">URI</a>&nbsp;<a href="?C=N&amp;O=D">&nbsp;↓&nbsp;</a></th><th style="width: 20%"><a href="?C=S&amp;O=A">Status</a>&nbsp;<a href="?C=S&amp;O=D">&nbsp;↓&nbsp;</a></th></tr></thead><tbody>';
+          for (var i = 0; i < fileList.length; i++) {
+            tableHtml += "<tr>";
+            tableHtml += '<td class="link"><a href="/download/' + fileList[i].sha256 + '">' + fileList[i].name + "</a></td>";
+            tableHtml += '<td class="link">' + fileList[i].size + "</td>";
+            tableHtml += '<td class="link">' + fileList[i].sha256 + "</td>";
+            tableHtml += '<td class="link">' + fileList[i].total_chunks + "</td>";
+            tableHtml += "</tr>";
+          }
+          tableHtml += "</tbody></table>";
+          tableBody.html(tableHtml);
+        });
+      });
+    </script>
   </body>
 </html>

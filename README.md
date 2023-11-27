@@ -13,9 +13,9 @@
 ```
 pymongo
 py7zr
-pyinstaller
 tabulate
 flask
+jsonify
 ```
 
 
@@ -45,3 +45,7 @@ flask
 ## How to store files
 
 ![](https://github.com/Anjiurine/Mongodb-Drive-Hub/assets/147403913/5d98a626-81f5-44ed-9481-6991114ab39b)
+
+## Special thanks
+
+Thanks to [Tsinghua University Open Source Software Mirror Station](https://mirrors.tuna.tsinghua.edu.cn/) for inspiring my web page style development.

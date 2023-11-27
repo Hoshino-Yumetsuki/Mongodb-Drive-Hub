@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html class="wf-lato-n4-active wf-active">
   <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" href="../static/img/favicon.ico" type="image/x-icon" />
-    <meta name="robots" content="noindex">
+    <meta name="robots" content="noindex" />
     <title>Mongodb-Drive-Hub - STATUS</title>
     <link rel="stylesheet" href="../static/css/bootstrap.min.css" />
     <link rel="stylesheet" href="../static/css/style.css" />
@@ -20,6 +20,7 @@
     <script src="../static/fontawesome-6/js/all.min.js"></script>
     <link rel="stylesheet" href="../static/css/swal-pub-style.css" />
     <link rel="stylesheet" href="../static/css/panai-style.css" />
+    <link rel="stylesheet" href="../static/css/loader.css" />
   </head>
   <body>
     <div class="navbar navbar-default" role="navigation">
@@ -27,9 +28,7 @@
         <div class="navbar-header">
           <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse"><span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span></button>
           <a class="navbar-brand" href="/">
-            <span>
-              Mongodb-Drive-Hub
-            </span>
+            <span><h2>Mongodb-Drive-Hub</h2></span>
           </a>
         </div>
         <div class="navbar-collapse collapse navbar-right">
@@ -40,49 +39,43 @@
         </div>
       </div>
     </div>
-    <div id="file_list">
+    <div id="status-list">
       <div class="spacing hidden-xs"></div>
       <div class="container">
         <div class="row">
           <div id="mirror-list" class="col-md-12 table-responsive">
+            <div class="loader-container">
+              <div class="loader"></div>
+            </div>
             <div>
               <div class="col-md-8 col-xs-12 vbottom">
                 <h3><i class="fa-solid fa-cube"></i> Status of Mongodb storage array</h3>
               </div>
             </div>
-            <table id="list" class="table">
-              <thead>
-                <tr>
-                  <th style="width: 55%"><a href="?C=N&amp;O=A">URI</a>&nbsp;<a href="?C=N&amp;O=D">&nbsp;↓&nbsp;</a></th>
-                  <th style="width: 20%"><a href="?C=S&amp;O=A">Status</a>&nbsp;<a href="?C=S&amp;O=D">&nbsp;↓&nbsp;</a></th>
-                </tr>
-              </thead>
-              {% for uri, status in status_result.items() %}
-              <tbody>
-                <tr>
-                  <td class="link">{{ uri }}</td>
-                  <td class="link">{{ status }}</td>
-                </tr>
-              </tbody>
-              {% endfor %}
-            </table>
+            <div id="list-container"></div>
           </div>
         </div>
       </div>
     </div>
     <script>
-      WebFont.load({ custom: { families: ["Lato"] } });
-      var lei3Po8h = ["support", ["tuna", "tsinghua", "edu", "cn"].join(".")].join("@");
-      $("a.eib1gieB")
-        .text(lei3Po8h)
-        .attr("href", ["ma", "lto:"].join("i") + lei3Po8h);
+      $(document).ready(function () {
+        $(".loader-container").show();
+        $.get("/api/status", function (data) {
+          $(".loader-container").hide();
+          var statusList = data;
+          var tableBody = $("#list-container");
+          var tableHtml =
+            '<table id="list" class="table"><thead><tr><th style="width: 55%"><a href="?C=N&amp;O=A">URI</a>&nbsp;<a href="?C=N&amp;O=D">&nbsp;↓&nbsp;</a></th><th style="width: 20%"><a href="?C=S&amp;O=A">Status</a>&nbsp;<a href="?C=S&amp;O=D">&nbsp;↓&nbsp;</a></th></tr></thead><tbody>';
+          for (var uri in statusList) {
+            tableHtml += "<tr>";
+            tableHtml += '<td class="link">' + uri + "</td>";
+            tableHtml += '<td class="link">' + statusList[uri] + "</td>";
+            tableHtml += "</tr>";
+          }
+          tableHtml += "</tbody></table>";
+          tableBody.html(tableHtml);
+        });
+      });
     </script>
-    <style>
-      #list tbody td,
-      #path {
-        font-family: "Fira Code Retina", "Fira Code", "Fira Mono", "JetBrains Mono", "Source Code Pro", "Consolas", "Menlo", "Monaco", "monospace", "NotoSansSC-Regular";
-        font-size: 12pt;
-      }
-    </style>
   </body>
 </html>

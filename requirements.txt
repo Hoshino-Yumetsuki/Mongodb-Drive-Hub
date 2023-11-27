@@ -2,3 +2,4 @@ pymongo
 py7zr
 tabulate
 flask
+jsonify
