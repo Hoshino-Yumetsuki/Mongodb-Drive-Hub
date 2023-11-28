@@ -51,6 +51,9 @@
               <div class="col-md-8 col-xs-12 vbottom">
                 <h3><i class="fa-solid fa-cube"></i> Index of Mongodb storage array</h3>
               </div>
+              <div id="search-container" style="text-align: right">
+                <input type="text" id="searchInput" class="bg-transparent" oninput="searchFiles()" placeholder="Search" />
+              </div>
             </div>
             <div id="list-container"></div>
           </div>
@@ -58,9 +61,10 @@
       </div>
     </div>
     <script>
-      $(document).ready(function () {
+      function searchFiles() {
+        var searchTerm = $("#searchInput").val();
         $(".loader-container").show();
-        $.get("/api/files", function (data) {
+        $.get("/api/files?search=" + searchTerm, function (data) {
           $(".loader-container").hide();
           var fileList = data;
           var tableBody = $("#list-container");
@@ -77,6 +81,9 @@
           tableHtml += "</tbody></table>";
           tableBody.html(tableHtml);
         });
+      }
+      $(document).ready(function () {
+        searchFiles();
       });
     </script>
   </body>

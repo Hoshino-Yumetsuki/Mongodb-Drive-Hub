@@ -9,6 +9,7 @@ import atexit
 import signal
 from flask import Flask, send_file, after_this_request, render_template
 from flask import jsonify
+from flask import request
 
 client_list = []
 
@@ -75,7 +76,13 @@ def download_file(file_sha256):
 
 @app.route('/api/files')
 def api_list_files():
+    search_term = request.args.get('search', '')  # 获取搜索条件，默认为空字符串
     file_list = mongo_utils.list_files(client_list, cli_output=False)
+
+    if search_term:
+        # 如果有搜索条件，筛选出符合条件的文件
+        file_list = [file for file in file_list if search_term in file['name']]
+
     return jsonify(file_list)
 
 @app.route('/api/status')

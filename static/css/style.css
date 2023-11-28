@@ -1,4 +1,12 @@
 @charset "UTF-8";
+input {
+  width: 300px;
+  height: 30px;
+  border-radius: 20px;
+  border: none;
+  outline: none;
+  text-indent: 1em;
+}
 #list tbody td,
 #path {
   font-family: "Fira Code Retina", "Fira Code", "Fira Mono", "JetBrains Mono", "Source Code Pro", "Consolas", "Menlo", "Monaco", "monospace", "NotoSansSC-Regular";
