@@ -106,6 +106,6 @@ def run_server_mode():
         client_list = mongo_utils.connect_mongo_cluster(uri_list)
         atexit.register(remove_temp_files)
         signal.signal(signal.SIGINT, signal_handler)
-        app.run(debug=True, host='0.0.0.0', port=19198, use_reloader=False)
+        app.run(debug=False, host='0.0.0.0', port=19198, use_reloader=False)
     except Exception as e:
         logging.error(f"An unexpected error occurred: {str(e)}\n{traceback.format_exc()}")
