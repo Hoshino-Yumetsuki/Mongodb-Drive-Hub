@@ -65,7 +65,7 @@
           var fileList = data;
           var tableBody = $("#list-container");
           var tableHtml =
-            '<table id="list" class="table"><thead><tr><th style="width: 55%"><a href="?C=N&amp;O=A">URI</a>&nbsp;<a href="?C=N&amp;O=D">&nbsp;↓&nbsp;</a></th><th style="width: 20%"><a href="?C=S&amp;O=A">Status</a>&nbsp;<a href="?C=S&amp;O=D">&nbsp;↓&nbsp;</a></th></tr></thead><tbody>';
+            '<table id="list" class="table"><thead><tr><th style="width: 55%"><a href="?C=N&amp;O=A">File Name</a>&nbsp;<a href="?C=N&amp;O=D">&nbsp;↓&nbsp;</a></th><th style="width: 20%"><a href="?C=S&amp;O=A">File Size</a>&nbsp;<a href="?C=S&amp;O=D">&nbsp;↓&nbsp;</a></th><th style="width: 25%"><a href="?C=M&amp;O=A">SHA256</a>&nbsp;<a href="?C=M&amp;O=D">&nbsp;↓&nbsp;</a></th><th style="width: 25%"><a href="?C=M&amp;O=A">Total Chunk</a>&nbsp;<a href="?C=M&amp;O=D">&nbsp;↓&nbsp;</a></th></tr></thead><tbody>';
           for (var i = 0; i < fileList.length; i++) {
             tableHtml += "<tr>";
             tableHtml += '<td class="link"><a href="/download/' + fileList[i].sha256 + '">' + fileList[i].name + "</a></td>";
