@@ -3,3 +3,4 @@ py7zr
 tabulate
 quart
 aiofiles
+wcwidth

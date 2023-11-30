@@ -6,6 +6,7 @@ import os
 import logging
 from concurrent.futures import ThreadPoolExecutor
 import tabulate
+import wcwidth
 
 logging.basicConfig(level=logging.INFO)
 
@@ -117,11 +118,17 @@ def list_files(client_list, cli_output=True):
             "ext": file_ext
         }
         file_list.append(file_info)
-
     if cli_output:
         headers = ["Name", "Size", "SHA256", "Total Chunks"]
         table_data = [(f["name"], f["size"], f["sha256"], f["total_chunks"]) for f in file_list]
-        print(tabulate.tabulate(table_data, headers=headers, tablefmt="grid"))
+        column_widths = [
+            max(wcwidth.wcswidth(str(row[i])) for row in table_data) for i in range(len(headers))
+        ]
+        formatted_table = tabulate.tabulate(
+            table_data, headers=headers, tablefmt="grid", colalign=("left", "left", "left", "left"),
+            colwidth=column_widths
+        )
+        print(formatted_table)
     else:
         return file_list
 
@@ -159,11 +166,17 @@ def search_file(client_list, keyword, cli_output=True):
             "total_chunks": total_chunks
         }
         file_list.append(file_info)
-
     if cli_output:
         headers = ["Name", "Size", "SHA256", "Total Chunks"]
         table_data = [(f["name"], f["size"], f["sha256"], f["total_chunks"]) for f in file_list]
-        print(tabulate.tabulate(table_data, headers=headers, tablefmt="grid"))
+        column_widths = [
+            max(wcwidth.wcswidth(str(row[i])) for row in table_data) for i in range(len(headers))
+        ]
+        formatted_table = tabulate.tabulate(
+            table_data, headers=headers, tablefmt="grid", colalign=("left", "left", "left", "left"),
+            colwidth=column_widths
+        )
+        print(formatted_table)
     else:
         return file_list
 
@@ -183,7 +196,6 @@ def reindex_files(client_list, save_path='./cache'):
 
 def dbstatus(client_list, cli_output=True):
     status_result = {}
-
     for client in client_list:
         uri = client.address[0]
         try:
@@ -192,11 +204,17 @@ def dbstatus(client_list, cli_output=True):
             status_result[uri] = "connected"
         except Exception as e:
             status_result[uri] = "disconnected"
-
     if cli_output:
         headers = ["Instance URI", "Status"]
         table_data = [(uri, status) for uri, status in status_result.items()]
-        print(tabulate.tabulate(table_data, headers=headers, tablefmt="grid"))
+        column_widths = [
+            max(wcwidth.wcswidth(str(row[i])) for row in table_data) for i in range(len(headers))
+        ]
+        formatted_table = tabulate.tabulate(
+            table_data, headers=headers, tablefmt="grid", colalign=("left", "left"),
+            colwidth=column_widths
+        )
+        print(formatted_table)
     else:
         return status_result
 
