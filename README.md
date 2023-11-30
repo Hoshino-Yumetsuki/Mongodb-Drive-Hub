@@ -42,7 +42,7 @@ jsonify
 - docker build -t mongodb-drive-hub:latest . --build-arg URI_LIST=./uri_list.json
 - docker run -d --name <your-container-name> -p <your-container-port>:19198 mongodb-drive-hub:latest
 
-ps:You can even deploy it to Huggingface Space
+**You can even deploy it to Huggingface Space**
 
 ## How to store files
 
