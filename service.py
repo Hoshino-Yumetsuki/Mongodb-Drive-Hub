@@ -10,7 +10,7 @@ import signal
 import asyncio
 from quart import Quart, render_template, jsonify, request, after_this_request, Response
 import mimetypes
-from quart.helpers import send_from_directory
+from quart.helpers import send_file as quart_send_file
 import aiofiles
 from hypercorn.config import Config
 from hypercorn.asyncio import serve
@@ -53,8 +53,8 @@ def run_cli_mode():
 app = Quart(__name__, instance_relative_config=True, template_folder='templates')
 
 @app.route('/static/<path:filename>')
-async def static_file(filename):
-    return await send_from_directory('./static', filename, cache_timeout=3600)
+async def serve_static(filename):
+    return await quart_send_file(filename, conditional=False, cache_timeout=3600)
 
 async def async_send_file(file_path, as_attachment=False):
     async with aiofiles.open(file_path, 'rb') as file:
