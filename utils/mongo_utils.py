@@ -113,7 +113,8 @@ def list_files(client_list, cli_output=True):
             "name": file_name + "." + file_ext,
             "size": file_size,
             "sha256": file_sha256,
-            "total_chunks": total_chunks
+            "total_chunks": total_chunks,
+            "ext": file_ext
         }
         file_list.append(file_info)
 

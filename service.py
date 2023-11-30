@@ -7,9 +7,13 @@ from concurrent.futures import ThreadPoolExecutor
 import sys
 import atexit
 import signal
-from flask import Flask, send_file, after_this_request, render_template
-from flask import jsonify
-from flask import request
+import asyncio
+from quart import Quart, render_template, jsonify, request, after_this_request, Response
+import mimetypes
+from quart.helpers import send_from_directory
+import aiofiles
+from hypercorn.config import Config
+from hypercorn.asyncio import serve
 
 client_list = []
 
@@ -46,48 +50,57 @@ def run_cli_mode():
     except Exception as e:
         logging.error(f"An unexpected error occurred: {str(e)}\n{traceback.format_exc()}")
 
-app = Flask(__name__, instance_relative_config=True, template_folder='templates')
+app = Quart(__name__, instance_relative_config=True, template_folder='templates')
+
+@app.route('/static/<path:filename>')
+async def static_file(filename):
+    return await send_from_directory('./static', filename, cache_timeout=3600)
+
+async def async_send_file(file_path, as_attachment=False):
+    async with aiofiles.open(file_path, 'rb') as file:
+        file_data = await file.read()
+        mime_type, _ = mimetypes.guess_type(file_path)
+        headers = {"Content-Type": mime_type}
+        if as_attachment:
+            headers["Content-Disposition"] = f"attachment; filename={os.path.basename(file_path)}"
+        return Response(file_data, headers=headers)
 
 @app.route('/')
-def js_rendered_files():
-    return render_template('index.html')
+async def js_rendered_files():
+    return await render_template('index.html')
 
 @app.route('/status')
-def js_rendered_status():
-    return render_template('status.html')
-
+async def js_rendered_status():
+    return await render_template('status.html')
 
 @app.route('/download/<file_sha256>')
-def download_file(file_sha256):
+async def download_file(file_sha256):
     save_path = "./cache/"
     if not os.path.exists(save_path):
         os.makedirs(save_path)
     try:
-        file_path = mongo_utils.download_file(client_list, file_sha256, save_path)
+        file_path = await asyncio.to_thread(mongo_utils.download_file, client_list, file_sha256, save_path)
         if file_path:
             @after_this_request
             def remove_temp_file(response):
                 return response
-            return send_file(file_path, as_attachment=True)
+            return await async_send_file(file_path, as_attachment=True)
         else:
             return "File does not exist", 404
     except Exception as e:
         return str(e), 500
 
 @app.route('/api/files')
-def api_list_files():
-    search_term = request.args.get('search', '')  # 获取搜索条件，默认为空字符串
-    file_list = mongo_utils.list_files(client_list, cli_output=False)
-
+async def api_list_files():
+    search_term = request.args.get('search', '')
+    file_list = await asyncio.to_thread(mongo_utils.list_files, client_list, cli_output=False)
     if search_term:
-        # 如果有搜索条件，筛选出符合条件的文件
         file_list = [file for file in file_list if search_term in file['name']]
-
     return jsonify(file_list)
 
 @app.route('/api/status')
-def api_get_status():
-    status_result = mongo_utils.dbstatus(client_list, cli_output=False)
+async def api_get_status():
+    status_result = await asyncio.to_thread(mongo_utils.dbstatus, client_list, cli_output=False)
     return jsonify(status_result)
 
 def signal_handler(sig, frame):
@@ -95,7 +108,7 @@ def signal_handler(sig, frame):
     remove_temp_files()
     sys.exit(0)
 
-def run_server_mode():
+async def run_server_mode():
     try:
         global client_list
         if os.path.exists('./uri_list.json') == False:
@@ -106,6 +119,11 @@ def run_server_mode():
         client_list = mongo_utils.connect_mongo_cluster(uri_list)
         atexit.register(remove_temp_files)
         signal.signal(signal.SIGINT, signal_handler)
-        app.run(debug=False, host='0.0.0.0', port=19198, use_reloader=False)
+        config = Config.from_mapping(
+            bind=["0.0.0.0:19198"],
+            workers=1,
+            loglevel="info",
+        )
+        await serve(app, config)
     except Exception as e:
         logging.error(f"An unexpected error occurred: {str(e)}\n{traceback.format_exc()}")
